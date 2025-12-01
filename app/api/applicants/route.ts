@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-client";
-import { crypto } from "crypto";
+import { randomUUID } from "crypto";
 
 // GET: Fetch all applicants
 export async function GET(request: NextRequest) {
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     console.log("[v0] Received POST body:", body);
 
-    const applicantId = crypto.randomUUID();
+    const applicantId = randomUUID();
 
     const applicantData = {
       id: applicantId, // Include id field from database constraint
