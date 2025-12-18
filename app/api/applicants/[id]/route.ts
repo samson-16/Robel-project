@@ -42,12 +42,23 @@ export async function PATCH(
     const { id } = params;
     const body = await request.json();
 
-    // Add updated_at timestamp and ensure status is lowercase
-    const updates = {
-      ...body,
-      ...(body.status && { status: body.status.toLowerCase() }), // Ensure lowercase for database constraint
+    // Normalize camelCase payload to match Supabase column names
+    const updates: Record<string, unknown> = {
       updated_at: new Date().toISOString(),
     };
+
+    if (body.name !== undefined) updates.name = body.name;
+    if (body.age !== undefined) updates.age = body.age;
+    if (body.phone !== undefined) updates.phone = body.phone;
+    if (body.passportNumber !== undefined || body.passport_number !== undefined) {
+      updates.passport_number = body.passportNumber ?? body.passport_number;
+    }
+    if (body.profilePicture !== undefined || body.profile_picture !== undefined) {
+      updates.profile_picture = body.profilePicture ?? body.profile_picture;
+    }
+    if (body.status) {
+      updates.status = String(body.status).toLowerCase();
+    }
 
     const { data, error } = await supabaseAdmin
       .from("applicants")

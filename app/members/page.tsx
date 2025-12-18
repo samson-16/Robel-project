@@ -16,6 +16,13 @@ export default function MembersPage() {
   const [isOwnerMode, setIsOwnerMode] = useState(false)
   const { applicants, addApplicant, updateApplicant, deleteApplicant, isLoading } = useApplicants()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const handleUpdateApplicant = async (id: string, updates: Omit<Applicant, "id" | "dateAdded">) => {
+    try {
+      await updateApplicant(id, updates)
+    } catch (error) {
+      console.error("[v0] Error updating applicant:", error)
+    }
+  }
 
   const handleAddApplicant = async (newApplicant: Omit<Applicant, "id" | "dateAdded">) => {
     setIsSubmitting(true)
@@ -99,6 +106,7 @@ export default function MembersPage() {
                       applicant={applicant}
                       onStatusChange={handleStatusChange}
                       onDelete={handleDelete}
+                      onUpdate={handleUpdateApplicant}
                       isOwnerMode={true}
                     />
                   ))}
