@@ -40,9 +40,7 @@ export default function MembersPage() {
   }
 
   const handleDelete = (id: string) => {
-    if (confirm("Are you sure you want to delete this applicant?")) {
-      deleteApplicant(id)
-    }
+    deleteApplicant(id)
   }
 
   if (!isOwnerMode) {

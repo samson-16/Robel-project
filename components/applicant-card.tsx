@@ -6,6 +6,16 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { Pencil, Trash2, Phone, Smartphone } from "lucide-react"
 import type { Applicant } from "@/lib/applicants-data"
 
@@ -32,6 +42,7 @@ export default function ApplicantCard({
 }: ApplicantCardProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [editData, setEditData] = useState({
     name: applicant.name,
@@ -228,14 +239,38 @@ export default function ApplicantCard({
                     <Pencil className="w-5 h-5" />
                     Edit details
                   </Button>
-                  <Button
-                    variant="destructive"
-                    className="flex-1 justify-center gap-2 py-3 text-sm font-semibold shadow-sm"
-                    onClick={() => onDelete(applicant.id)}
-                  >
-                    <Trash2 className="w-5 h-5" />
-                    Delete member
-                  </Button>
+                  <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="destructive"
+                        className="flex-1 justify-center gap-2 py-3 text-sm font-semibold shadow-sm"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                        Delete member
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure you want to delete?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will permanently delete <span className="font-semibold">{applicant.name}</span> from the system. This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <Button
+                          variant="destructive"
+                          className="bg-red-600 text-white hover:bg-red-700"
+                          onClick={() => {
+                            onDelete(applicant.id)
+                            setIsDeleteDialogOpen(false)
+                          }}
+                        >
+                          Delete
+                        </Button>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </div>
             )}

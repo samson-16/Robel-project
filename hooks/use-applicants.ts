@@ -41,6 +41,14 @@ export function useApplicants() {
   const updateApplicant = async (id: string, updates: Partial<Applicant>) => {
     try {
       console.log("[v0] Updating applicant:", id, updates)
+      
+      // Optimistic update: immediately update in UI
+      const currentData = data || []
+      const updatedData = currentData.map((a) =>
+        a.id === id ? { ...a, ...updates } : a
+      )
+      mutate(updatedData, false) // Update cache immediately without revalidation
+      
       const res = await fetch(`/api/applicants/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -48,10 +56,13 @@ export function useApplicants() {
       })
 
       if (!res.ok) {
+        // Rollback on error
+        mutate(currentData, false)
         throw new Error(`API error: ${res.status}`)
       }
 
       const updated = await res.json()
+      // Revalidate to ensure sync with server
       mutate()
       return updated
     } catch (error) {
@@ -63,12 +74,21 @@ export function useApplicants() {
   const deleteApplicant = async (id: string) => {
     try {
       console.log("[v0] Deleting applicant:", id)
+      
+      // Optimistic update: immediately remove from UI
+      const currentData = data || []
+      const filteredData = currentData.filter((a) => a.id !== id)
+      mutate(filteredData, false) // Update cache immediately without revalidation
+      
       const res = await fetch(`/api/applicants/${id}`, { method: "DELETE" })
 
       if (!res.ok) {
+        // Rollback on error
+        mutate(currentData, false)
         throw new Error(`API error: ${res.status}`)
       }
 
+      // Revalidate to ensure sync with server
       mutate()
     } catch (error) {
       console.error("[v0] Error deleting applicant:", error)
